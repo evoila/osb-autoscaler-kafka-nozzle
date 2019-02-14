@@ -189,6 +189,12 @@ func (cli *CLI) Run(args []string) int {
 
 	// Create cert files for kafka
 	if config.Kafka.Secure {
+		if strings.HasSuffix(os.TempDir(), "/") {
+			config.Kafka.Filename = "server.cer.pem"
+		} else {
+			config.Kafka.Filename = "/server.cer.pem"
+		}
+
 		createCertificateFiles(config, logger)
 	}
 
@@ -439,14 +445,14 @@ func (cli *CLI) Run(args []string) int {
 func createCertificateFiles(config *config.Config, logger *log.Logger) {
 	// Create file for ca certificate
 	caCertContent := []byte(config.Kafka.SslCa)
-	err := ioutil.WriteFile(os.TempDir()+"server.cer.pem", caCertContent, 0666)
+	err := ioutil.WriteFile(os.TempDir()+config.Kafka.Filename, caCertContent, 0777)
 	if err != nil {
 		log.Fatal("Cannot create ca certificate file", err)
 	}
-	logger.Printf("[INFO] Ca certificate file created: " + os.TempDir() + "server.cer.pem")
+	logger.Printf("[INFO] Ca certificate file created: " + os.TempDir() + config.Kafka.Filename)
 
 	// Create file for client certificate
-	clientCertContent := []byte(config.Kafka.SslCertificate)
+	/*clientCertContent := []byte(config.Kafka.SslCertificate)
 	err = ioutil.WriteFile(os.TempDir()+"client.cer.pem", clientCertContent, 0666)
 	if err != nil {
 		log.Fatal("Cannot create client certificate file", err)
@@ -459,7 +465,7 @@ func createCertificateFiles(config *config.Config, logger *log.Logger) {
 	if err != nil {
 		log.Fatal("Cannot create client key file", err)
 	}
-	logger.Printf("[INFO] Client key file created: " + os.TempDir() + "client.key.pem")
+	logger.Printf("[INFO] Client key file created: " + os.TempDir() + "client.key.pem")*/
 }
 
 func godoc() error {

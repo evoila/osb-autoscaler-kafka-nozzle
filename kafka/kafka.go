@@ -43,6 +43,7 @@ const (
 	DefaultSubInputBufferSize = 1024
 )
 
+//Create new KafkaConsumer with the possibility to handle security
 func NewKafkaConsumer(config *config.Config) (*kafka.Consumer, error) {
 	brokers := config.Kafka.Brokers
 	if len(brokers) < 1 {
@@ -64,9 +65,7 @@ func NewKafkaConsumer(config *config.Config) (*kafka.Consumer, error) {
 		consumerConfig.SetKey("sasl.mechanism", "SCRAM-SHA-256")
 		consumerConfig.SetKey("sasl.username", config.Kafka.SaslUsername)
 		consumerConfig.SetKey("sasl.password", config.Kafka.SaslPassword)
-		consumerConfig.SetKey("ssl.ca.location", os.TempDir()+"/server.cer.pem")
-		consumerConfig.SetKey("ssl.certificate.location", os.TempDir()+"/client.cer.pem")
-		consumerConfig.SetKey("ssl.key.location", os.TempDir()+"/client.key.pem")
+		consumerConfig.SetKey("ssl.ca.location", os.TempDir()+config.Kafka.Filename)
 	}
 
 	if config.Kafka.RetryBackoff != 0 {
@@ -85,6 +84,7 @@ func NewKafkaConsumer(config *config.Config) (*kafka.Consumer, error) {
 	}
 }
 
+//Create new KafkaProducer with the possibility to handle security
 func NewKafkaProducer(logger *log.Logger, stats *stats.Stats, config *config.Config) (NozzleProducer, error) {
 	brokers := config.Kafka.Brokers
 	if len(brokers) < 1 {
@@ -99,13 +99,12 @@ func NewKafkaProducer(logger *log.Logger, stats *stats.Stats, config *config.Con
 	}
 
 	if config.Kafka.Secure {
+
 		producerConfig.SetKey("security.protocol", "sasl_ssl")
 		producerConfig.SetKey("sasl.mechanism", "SCRAM-SHA-256")
 		producerConfig.SetKey("sasl.username", config.Kafka.SaslUsername)
 		producerConfig.SetKey("sasl.password", config.Kafka.SaslPassword)
-		producerConfig.SetKey("ssl.ca.location", os.TempDir()+"/server.cer.pem")
-		producerConfig.SetKey("ssl.certificate.location", os.TempDir()+"/client.cer.pem")
-		producerConfig.SetKey("ssl.key.location", os.TempDir()+"/client.key.pem")
+		producerConfig.SetKey("ssl.ca.location", os.TempDir()+config.Kafka.Filename)
 	}
 
 	if config.Kafka.RetryMax != 0 {
@@ -209,12 +208,12 @@ func DecodeMessage(consumerMessage []byte, logger *log.Logger) {
 		var data map[string]string
 		json.Unmarshal(consumerMessage, &data)
 
-		logger.Printf("[INFO] Received binding for application with id = %s, collection data...", data["appId"])
-
 		if data["appId"] != "" {
 			if data["action"] == "bind" || data["action"] == "load" {
+				logger.Printf("[INFO] Received binding for application with id = %s, collecting data...", data["appId"])
 				Bind(data)
 			} else if data["action"] == "unbind" {
+				logger.Printf("[INFO] Received unbinding for application with id = %s, collecting data...", data["appId"])
 				Unbind(data)
 			} else {
 				logger.Printf("[ERROR] Unknown action in a binding message for id = %s : %s", data["appId"], data["action"])
@@ -307,10 +306,16 @@ func (kp *KafkaProducer) input(event *events.Envelope) {
 			jsonHttpMetric, err := json.Marshal(httpMetric)
 
 			if err == nil {
-				kp.Producer.Produce(&kafka.Message{
+				err = kp.Producer.Produce(&kafka.Message{
 					TopicPartition: kafka.TopicPartition{Topic: &kp.httpMetricTopic, Partition: kafka.PartitionAny},
 					Value:          jsonHttpMetric,
 				}, kp.deliveryChan)
+
+				if err != nil {
+					fmt.Printf("[ERROR] Could not enqueue message on kafka: " + err.Error())
+					kp.Stats.Inc(stats.PublishFail)
+				}
+
 				kp.Stats.Inc(stats.Consume)
 			}
 		}
@@ -337,10 +342,16 @@ func (kp *KafkaProducer) input(event *events.Envelope) {
 				jsonLogMessage, err := json.Marshal(logMessage)
 
 				if err == nil {
-					kp.Producer.Produce(&kafka.Message{
+					err = kp.Producer.Produce(&kafka.Message{
 						TopicPartition: kafka.TopicPartition{Topic: &kp.logMessageTopic, Partition: kafka.PartitionAny},
 						Value:          jsonLogMessage,
 					}, kp.deliveryChan)
+
+					if err != nil {
+						fmt.Printf("[ERROR] Could not enqueue message on kafka: " + err.Error())
+						kp.Stats.Inc(stats.PublishFail)
+					}
+
 					kp.Stats.Inc(stats.Consume)
 				}
 			}
@@ -380,18 +391,29 @@ func (kp *KafkaProducer) input(event *events.Envelope) {
 
 				if err == nil {
 					if checkIfAutoscalerIsBound(appId, redisEntry) {
-						kp.Producer.Produce(&kafka.Message{
+						err = kp.Producer.Produce(&kafka.Message{
 							TopicPartition: kafka.TopicPartition{Topic: &kp.autoscalerContainerMetricTopic, Partition: kafka.PartitionAny},
 							Value:          jsonContainerMetric,
 						}, kp.deliveryChan)
+
+						if err != nil {
+							fmt.Printf("[ERROR] Could not enqueue message on kafka: " + err.Error())
+							kp.Stats.Inc(stats.PublishFail)
+						}
 					}
 
 					if checkIfLogMetricIsBound(appId, redisEntry) {
-						kp.Producer.Produce(&kafka.Message{
+						err = kp.Producer.Produce(&kafka.Message{
 							TopicPartition: kafka.TopicPartition{Topic: &kp.logMetricContainerMetricTopic, Partition: kafka.PartitionAny},
 							Value:          jsonContainerMetric,
 						}, kp.deliveryChan)
+
+						if err != nil {
+							fmt.Printf("[ERROR] Could not enqueue message on kafka: " + err.Error())
+							kp.Stats.Inc(stats.PublishFail)
+						}
 					}
+
 					kp.Stats.Inc(stats.Consume)
 				}
 			}

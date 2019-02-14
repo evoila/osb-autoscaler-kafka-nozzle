@@ -62,6 +62,7 @@ type Kafka struct {
 	SslCa          string `env:"KAFKA_SSL_CA"`
 	SslCertificate string `env:"KAFKA_SSL_CERTIFICATE"`
 	SslKey         string `env:"KAFKA_SSL_KEY"`
+	Filename       string
 }
 
 type Topic struct {

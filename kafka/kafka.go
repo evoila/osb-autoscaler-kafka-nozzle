@@ -289,34 +289,42 @@ func (kp *KafkaProducer) input(event *events.Envelope) {
 	case events.Envelope_HttpStart:
 		// Do nothing
 	case events.Envelope_HttpStartStop:
-		if event.GetHttpStartStop().GetApplicationId() != nil && event.GetHttpStartStop().GetPeerType() == 1 &&
-			checkIfPublishIsPossible(uuidToString(event.GetHttpStartStop().GetApplicationId())) {
+		var appId string = uuidToString(event.GetHttpStartStop().GetApplicationId())
+		if appId != "" {
+			redisEntry := getAppEnvironmentAsJson(appId)
+			if event.GetHttpStartStop().GetPeerType() == 1 &&
+				checkIfPublishIsPossible(appId) {
 
-			latency := event.GetHttpStartStop().GetStopTimestamp() - event.GetHttpStartStop().GetStartTimestamp()
+				latency := event.GetHttpStartStop().GetStopTimestamp() - event.GetHttpStartStop().GetStartTimestamp()
 
-			httpMetric := &autoscaler.HttpMetric{
-				Timestamp:   event.GetTimestamp() / 1000 / 1000, //convert to ms
-				MetricName:  "HttpMetric",
-				AppId:       uuidToString(event.GetHttpStartStop().GetApplicationId()),
-				Requests:    1,
-				Latency:     int32(latency) / 1000 / 1000, //convert to ms
-				Description: "Statuscode: " + strconv.Itoa(int(event.GetHttpStartStop().GetStatusCode())),
-			}
-
-			jsonHttpMetric, err := json.Marshal(httpMetric)
-
-			if err == nil {
-				err = kp.Producer.Produce(&kafka.Message{
-					TopicPartition: kafka.TopicPartition{Topic: &kp.httpMetricTopic, Partition: kafka.PartitionAny},
-					Value:          jsonHttpMetric,
-				}, kp.deliveryChan)
-
-				if err != nil {
-					fmt.Printf("[ERROR] Could not enqueue message on kafka: " + err.Error())
-					kp.Stats.Inc(stats.PublishFail)
+				httpMetric := &autoscaler.HttpMetric{
+					Timestamp:        event.GetTimestamp() / 1000 / 1000, //convert to ms
+					MetricName:       "HttpMetric",
+					AppId:            appId,
+					AppName:          redisEntry["applicationName"].(string),
+					Space:            redisEntry["space"].(string),
+					Organization:     redisEntry["organization"].(string),
+					OrganizationGuid: redisEntry["organization_guid"].(string),
+					Requests:         1,
+					Latency:          int32(latency) / 1000 / 1000, //convert to ms
+					Description:      "Statuscode: " + strconv.Itoa(int(event.GetHttpStartStop().GetStatusCode())),
 				}
 
-				kp.Stats.Inc(stats.Consume)
+				jsonHttpMetric, err := json.Marshal(httpMetric)
+
+				if err == nil {
+					err = kp.Producer.Produce(&kafka.Message{
+						TopicPartition: kafka.TopicPartition{Topic: &kp.httpMetricTopic, Partition: kafka.PartitionAny},
+						Value:          jsonHttpMetric,
+					}, kp.deliveryChan)
+
+					if err != nil {
+						fmt.Printf("[ERROR] Could not enqueue message on kafka: " + err.Error())
+						kp.Stats.Inc(stats.PublishFail)
+					}
+
+					kp.Stats.Inc(stats.Consume)
+				}
 			}
 		}
 	case events.Envelope_HttpStop:

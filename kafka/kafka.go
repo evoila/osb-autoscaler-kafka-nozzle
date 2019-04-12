@@ -53,11 +53,10 @@ func NewKafkaConsumer(config *config.Config) (*kafka.Consumer, error) {
 	topics := []string{config.Kafka.Topic.BindingsTopic}
 
 	consumerConfig := kafka.ConfigMap{
-		"bootstrap.servers":           strings.Join(brokers, ", "),
-		"group.id":                    "bindings-consumer",
-		"auto.offset.reset":           "earliest",
-		"retry.backoff.ms":            DefaultKafkaRetryBackoff,
-		"socket.receive.buffer.bytes": DefaultChannelBufferSize,
+		"bootstrap.servers": strings.Join(brokers, ", "),
+		"group.id":          "bindings-consumer",
+		"auto.offset.reset": "earliest",
+		"retry.backoff.ms":  DefaultKafkaRetryBackoff,
 	}
 
 	if config.Kafka.Secure {

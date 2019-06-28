@@ -22,9 +22,10 @@ type Environment struct {
 
 func NewCfClient(config *config.Config) {
 	goCfClient, err = cfclient.NewClient(&cfclient.Config{
-		ApiAddress: config.GoCfClient.Api,
-		Username:   config.GoCfClient.Username,
-		Password:   config.GoCfClient.Password,
+		ApiAddress:        config.GoCfClient.Api,
+		Username:          config.GoCfClient.Username,
+		Password:          config.GoCfClient.Password,
+		SkipSslValidation: true,
 	})
 
 	if err != nil {

@@ -98,7 +98,6 @@ func NewKafkaProducer(logger *log.Logger, stats *stats.Stats, config *config.Con
 	}
 
 	if config.Kafka.Secure {
-
 		producerConfig.SetKey("security.protocol", "sasl_ssl")
 		producerConfig.SetKey("sasl.mechanism", "SCRAM-SHA-256")
 		producerConfig.SetKey("sasl.username", config.Kafka.SaslUsername)

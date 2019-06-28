@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/evoila/osb-autoscaler-kafka-nozzle/cli"
+	"github.com/evoila/cf-kafka-nozzle/cli"
 )
 
 func main() {

@@ -14,11 +14,11 @@ import (
 
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/evoila/osb-autoscaler-kafka-nozzle/autoscaler"
-	"github.com/evoila/osb-autoscaler-kafka-nozzle/cf"
-	"github.com/evoila/osb-autoscaler-kafka-nozzle/config"
-	"github.com/evoila/osb-autoscaler-kafka-nozzle/redisClient"
-	"github.com/evoila/osb-autoscaler-kafka-nozzle/stats"
+	"github.com/evoila/cf-kafka-nozzle/autoscaler"
+	"github.com/evoila/cf-kafka-nozzle/cf"
+	"github.com/evoila/cf-kafka-nozzle/config"
+	"github.com/evoila/cf-kafka-nozzle/redisClient"
+	"github.com/evoila/cf-kafka-nozzle/stats"
 	"golang.org/x/net/context"
 )
 

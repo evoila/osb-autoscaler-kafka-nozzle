@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/evoila/osb-autoscaler-kafka-nozzle/config"
+	"github.com/evoila/cf-kafka-nozzle/config"
 	"github.com/go-redis/redis"
 )
 

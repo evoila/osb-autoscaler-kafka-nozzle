@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/evoila/osb-autoscaler-kafka-nozzle/config"
+	"github.com/evoila/cf-kafka-nozzle/config"
 )
 
 var goCfClient *cfclient.Client

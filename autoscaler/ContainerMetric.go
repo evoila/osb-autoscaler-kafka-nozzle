@@ -6,6 +6,8 @@ type ContainerMetric struct {
 	AppId            string `json:"appId"`
 	AppName          string `json:"appName"`
 	Space            string `json:"space"`
+	SpaceId          string `json:"spaceId"`
+	Organization	 string `json:"organization"`
 	OrganizationGuid string `json:"organizationGuid"`
 	Cpu              int32  `json:"cpu"`
 	Ram              int64  `json:"ram"`

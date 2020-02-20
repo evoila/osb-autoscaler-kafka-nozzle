@@ -1,11 +1,11 @@
 package: github.com/evoila/cf-kafka-nozzle
 import:
 - package: github.com/BurntSushi/toml
-  version: v0.2.0
+  version: v0.3.1
 - package: github.com/cloudfoundry-incubator/uaago
-  version: 5253fdf54e4a464366e5ffa8e5f456f5f1e50a2f
+  version: be6a0cef0130f933079e4c958abac60fadea0c85
 - package: github.com/cloudfoundry/noaa
-  version: ece624d29c30f7c8288edffedecd5a29e6e791cb
+  version: 5ce49363dfa666c00fc716cb5f8c2f99462b41ef
   subpackages:
   - consumer
   - errors
@@ -14,41 +14,42 @@ import:
   subpackages:
   - events
 - package: github.com/davecgh/go-spew
-  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  version: v1.1.1
   subpackages:
   - spew
 - package: github.com/eapache/go-resiliency
-  version: b86b1ec0dd4209a588dc1285cdd471e73525c0b3
+  version: v1.2.0
   subpackages:
   - breaker
 - package: github.com/eapache/queue
-  version: v1.0.2
+  version: v1.1.0
 - package: github.com/fukata/golang-stats-api-handler
-  version: ab9f90f16caab828afda479fd34bfbbbba2efcee
+  version: v1.0.0
 - package: github.com/gogo/protobuf
-  version: 74b6e9deaff6ba6da1389ec97351d337f0d08b06
+  version: v1.3.1
   subpackages:
   - gogoproto
   - proto
   - protoc-gen-gogo/descriptor
 - package: github.com/golang/snappy
-  version: 5f1c01d9f64b941dd9582c638279d046eda6ca31
+  version: 2a8bb927dd31d8daada140a5d09578521ce5c36a
 - package: github.com/gorilla/websocket
-  version: e2e3d8414d0fbae04004f151979f4e27c6747fe7
+  version: v1.4.1
 - package: github.com/hashicorp/logutils
-  version: 0dc08b1671f34c4250ce212759ebd880f743d883
+  version: v1.0.0
 - package: github.com/klauspost/crc32
-  version: v1.0
+  version: v1.2.0
 - package: github.com/rakutentech/go-nozzle
-  version: 5ea7d8dd3be1bceb05513fcff0a5cba6e806d706
-- package: golang.org/x/net
-  version: fb93926129b8ec0056f2f458b1f519654814edf0
+  version: f4952a44e07754b06bb79bc844fe7a6eb3140080
+- package: github.com/golang/net
+  version: release-branch.go1.14
   subpackages:
   - context
 - package: github.com/caarlos0/env
-  version: v3.3.0
+  version: v6.1.0
 - package: github.com/cloudfoundry-community/go-cfclient
+  version: 35bcce23fc5f8b9969723ac38c0de1f82c4d3471
 - package: github.com/confluentinc/confluent-kafka-go
-  version: v0.11.6
+  version: v1.3.0
 - package: github.com/go-redis/redis
-  version: v6.15.6
+  version: v6.15.7

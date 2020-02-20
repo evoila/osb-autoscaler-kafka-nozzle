@@ -6,6 +6,7 @@ type HttpMetric struct {
 	AppId            string `json:"appId"`
 	AppName          string `json:"appName"`
 	Space            string `json:"space"`
+	SpaceId          string `json:"spaceId"`
 	Organization     string `json:"organization"`
 	OrganizationGuid string `json:"organizationGuid"`
 	Requests         int32  `json:"requests"`

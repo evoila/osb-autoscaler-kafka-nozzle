@@ -14,7 +14,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/evoila/cf-kafka-nozzle/cf"
 	"github.com/evoila/cf-kafka-nozzle/config"
 	"github.com/evoila/cf-kafka-nozzle/kafka"
 	"github.com/evoila/cf-kafka-nozzle/redisClient"
@@ -259,13 +258,6 @@ func (cli *CLI) Run(args []string) int {
 		logger.Printf("[INFO] Redis DB %d", config.GoRedisClient.DB)
 	}
 
-	//Setup kafka consumer
-	consumer, err := kafka.NewKafkaConsumer(config)
-	if err != nil {
-		logger.Printf("[ERROR] Failed to construct kafka consumer: %s", err)
-		return ExitCodeError
-	}
-
 	// Setup nozzle producer
 	var producer kafka.NozzleProducer
 	if debug {
@@ -392,16 +384,8 @@ func (cli *CLI) Run(args []string) int {
 	logger.Printf("[INFO] Start Redis Client for host %v", config.GoRedisClient.Addrs)
 	redisClient.CheckIfCluster(config)
 
-	// Create a cf client
-	cf.NewCfClient(config)
-	logger.Printf("[INFO] Start Cloud Foundry Client for host %s", config.GoCfClient.Api)
-
 	// Start kafka consumer
 	logger.Println("[INFO] Start kafka consumer process")
-
-	go func() {
-		kafka.Consume(ctx, consumer, logger)
-	}()
 
 	// Start multiple produce worker processes.
 	// nozzle consumer events will be distributed to each producer.

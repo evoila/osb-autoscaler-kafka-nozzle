@@ -52,4 +52,4 @@ import:
 - package: github.com/confluentinc/confluent-kafka-go
   version: v1.3.0
 - package: github.com/go-redis/redis
-  version: v7.2.0
+  version: v6.15.7

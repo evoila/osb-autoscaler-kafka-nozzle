@@ -24,7 +24,7 @@ import:
 - package: github.com/eapache/queue
   version: v1.1.0
 - package: github.com/fukata/golang-stats-api-handler
-  version: v2.0.0
+  version: v1.0.0
 - package: github.com/gogo/protobuf
   version: v1.3.1
   subpackages:
@@ -41,7 +41,7 @@ import:
   version: v1.2.0
 - package: github.com/rakutentech/go-nozzle
   version: f4952a44e07754b06bb79bc844fe7a6eb3140080
-- package: golang.org/x/net
+- package: github.com/golang/net
   version: release-branch.go1.14
   subpackages:
   - context

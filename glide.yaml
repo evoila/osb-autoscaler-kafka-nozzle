@@ -50,6 +50,6 @@ import:
 - package: github.com/cloudfoundry-community/go-cfclient
   version: 35bcce23fc5f8b9969723ac38c0de1f82c4d3471
 - package: github.com/confluentinc/confluent-kafka-go
-  version: v1.3.0
+  version: v1.4.2
 - package: github.com/go-redis/redis
   version: v6.15.7
